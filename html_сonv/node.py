@@ -1,6 +1,8 @@
 from typing import Any
 from uuid import uuid4
-from htmlConv.constants.html_tag_mappers import SELF_CLOSING_TAGS
+
+from html_сonv.attrs_utils import introspect_attributes
+from html_сonv.constants.html_tag_mappers import SELF_CLOSING_TAGS
 
 
 class Node:
@@ -8,6 +10,7 @@ class Node:
         self,
         tag_name: str,
         attributes: dict[str, str],
+        is_self_closed_tag: bool,
         children: "tuple[Node | str, ...]" = (),
     ):
         """Initialize a new Node instance representing an HTML element.
@@ -28,7 +31,7 @@ class Node:
         self.tag_name = tag_name
         self.attributes = attributes
         self.children = children
-        self.__is_self_closed_tag = tag_name in SELF_CLOSING_TAGS
+        self.is_self_closed_tag = is_self_closed_tag
 
     @property
     def node_id(self) -> str:
@@ -155,7 +158,7 @@ class Node:
                 For regular tags, returns the opening tag, all child content as HTML,
                 and the closing tag concatenated together.
         """
-        if self.__is_self_closed_tag:
+        if self.is_self_closed_tag:
             return self.create_self_closing_tag_string()
         return (
             self.create_open_tag_string()
@@ -260,15 +263,21 @@ class Node:
             ValueError: If the dictionary does not contain a valid HTML element structure.
         """
         tag_name = interpretable_data.get("tag_name")
-        attributes = interpretable_data.get("attributes", {})
-        children = interpretable_data.get("children", ())
 
         # Check if the dictionary contains required keys
         if tag_name is None:
             raise ValueError("Dictionary must contain 'tag_name' key")
 
+        is_self_closed_tag = tag_name in SELF_CLOSING_TAGS
+
+        attributes = introspect_attributes(
+            tag_name, interpretable_data.get("attributes", {}), is_self_closed_tag
+        )
+
+        children = interpretable_data.get("children", ())
+
         # Create the Node instance with the provided tag name and attributes
-        node = cls(interpretable_data["tag_name"], attributes)
+        node = cls(interpretable_data["tag_name"], attributes, is_self_closed_tag)
 
         child_data: dict[str, Any] | str
 
