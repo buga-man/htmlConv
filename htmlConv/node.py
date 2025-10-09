@@ -1,3 +1,4 @@
+from typing import Any
 from uuid import uuid4
 from htmlConv.constants.html_tag_mappers import SELF_CLOSING_TAGS
 
@@ -231,3 +232,59 @@ class Node:
         if attributes:
             return f"<{self.tag_name} {attributes}/>"
         return f"<{self.tag_name}/>"
+
+    @classmethod
+    def from_dict(cls, interpretable_data: dict[str, Any]) -> "Node":
+        """Create a Node instance from a dictionary containing interpretable data.
+
+        This class method is a static method that takes a dictionary as input and
+        constructs a Node instance based on the provided data. The dictionary can
+        contain various HTML attributes, tag names, and nested elements. The method
+        handles the conversion of string values to their corresponding Node instances
+        and constructs the Node tree recursively.
+
+        Args:
+            interpretable_data (dict[str, Any]): A dictionary containing interpretable
+                data representing HTML elements. The dictionary should have the following
+                structure:
+                {
+                    "tag_name": str,
+                    "attributes": dict[str, str],
+                    "children": list[dict[str, Any] | str],
+                }
+
+        Returns:
+            Node: A Node instance constructed from the provided dictionary.
+
+        Raises:
+            ValueError: If the dictionary does not contain a valid HTML element structure.
+        """
+        tag_name = interpretable_data.get("tag_name")
+        attributes = interpretable_data.get("attributes", {})
+        children = interpretable_data.get("children", ())
+
+        # Check if the dictionary contains required keys
+        if tag_name is None:
+            raise ValueError("Dictionary must contain 'tag_name' key")
+
+        # Create the Node instance with the provided tag name and attributes
+        node = cls(interpretable_data["tag_name"], attributes)
+
+        child_data: dict[str, Any] | str
+
+        # Process the children of the Node
+        for child_data in children:
+            if not isinstance(child_data, (dict, str)):  # pyright: ignore[reportUnnecessaryIsInstance]
+                raise ValueError(
+                    f"Invalid child data type: {type(child_data).__name__}"
+                )
+
+            child_node = (
+                cls.from_dict(child_data)
+                if isinstance(child_data, dict)
+                else child_data
+            )
+
+            node.add_child(child_node)
+
+        return node
