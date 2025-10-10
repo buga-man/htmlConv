@@ -1,6 +1,12 @@
 from html_conv import HTMLNode
 
 
+def node_to_html(child: HTMLNode | str) -> str:
+    if isinstance(child, str):
+        return child
+    return to_html(child)
+
+
 def to_html(root_node: HTMLNode) -> str:
     html_attrs = root_node.attributes.attributes_to_html_string()
     html: str
@@ -13,12 +19,6 @@ def to_html(root_node: HTMLNode) -> str:
             + create_close_tag_string(root_node)
         )
     return html
-
-
-def node_to_html(child: HTMLNode | str) -> str:
-    if isinstance(child, str):
-        return child
-    return node_to_html(child)
 
 
 def create_open_tag_string(node: HTMLNode, html_attrs: str) -> str:
