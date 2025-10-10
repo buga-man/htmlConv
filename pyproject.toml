@@ -62,9 +62,6 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "--color=yes",
-    "--cov=html_conv",
-    "--cov-report=term-missing",
-    "--cov-report=html",
 ]
 
 [tool.ruff]
