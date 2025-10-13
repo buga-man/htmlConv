@@ -1,5 +1,5 @@
-from html_conv.attributes import Attributes
 from html_conv.constants import html_tag_mappers
+from html_conv.primitives.attributes import Attributes
 
 
 def test_attributes_to_html_string_empty_attributes() -> None:
@@ -27,7 +27,7 @@ def test_attributes_to_html_string_multiple_attributes() -> None:
 def test_clean_attributes() -> None:
     """Test that clean_attributes sets attributes to empty dictionary."""
     attrs = Attributes({"class": "container", "id": "main"}, "div")
-    attrs.clean_attributes()
+    attrs.remove_attributes()
     assert attrs.attributes == {}
 
 
@@ -35,7 +35,7 @@ def test_update_attribute_create_new_true() -> None:
     """Test that update_attribute creates a new attribute when create_new is True."""
     attrs = Attributes({"class": "container"}, "div")
 
-    attrs.update_attribute("data-test", "value", create_new=True)
+    attrs.update_attr("data-test", "value", create_new=True)
 
     assert "data-test" in attrs.attributes
     assert attrs.attributes["data-test"] == "value"
@@ -48,7 +48,7 @@ def test_update_attribute_doesnt_create_when_create_new_false_and_attribute_mis(
     is False and the attribute does not exist."""
     attrs = Attributes({"id": "test-id", "class": "container"}, "div")
 
-    attrs.update_attribute("data-custom", "value", create_new=False)
+    attrs.update_attr("data-custom", "value", create_new=False)
 
     assert "data-custom" not in attrs.attributes
     assert attrs.attributes == {"id": "test-id", "class": "container"}
@@ -59,7 +59,7 @@ def test_update_attribute_updates_existing_attribute_when_create_new_is_false() 
     attrs = Attributes({"class": "old-value", "id": "test-id"}, "div")
 
     # Act
-    attrs.update_attribute("class", "new-value", create_new=False)
+    attrs.update_attr("class", "new-value", create_new=False)
 
     # Assert
     assert attrs.attributes["class"] == "new-value"
@@ -94,7 +94,7 @@ def test_combine_all_possible_attributes() -> None:
     and tag-specific attributes."""
 
     # Test with a tag that has specific attributes (e.g., 'img')
-    result = Attributes.combine_all_possible_attributes("img")
+    result = Attributes.__combine_all_possible_attributes("img")
 
     # Verify that global attributes are included
     assert "class" in result
@@ -112,7 +112,7 @@ def test_combine_all_possible_attributes() -> None:
     assert "height" in result
 
     # Test with a tag that has no specific attributes (e.g., 'div')
-    result_div = Attributes.combine_all_possible_attributes("div")
+    result_div = Attributes.__combine_all_possible_attributes("div")
 
     # Verify that global and event attributes are still included
     assert "class" in result_div

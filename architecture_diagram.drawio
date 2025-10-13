@@ -1,0 +1,79 @@
+<mxfile host="65bd71144e">
+    <diagram name="HTML Conv Architecture" id="architecture">
+        <mxGraphModel dx="1980" dy="997" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="HTML Conv - Architecture Overview" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="600" y="20" width="400" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="core-section" value="Core Classes" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="100" width="400" height="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="htmlnode" value="HTMLNode" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" parent="core-section" vertex="1">
+                    <mxGeometry y="30" width="400" height="180" as="geometry"/>
+                </mxCell>
+                <mxCell id="htmlnode-props" value="+ tag_name: str&#xa;+ attributes: Attributes&#xa;+ children: tuple[HTMLNode | str, ...]&#xa;+ is_self_closing: bool" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="htmlnode" vertex="1">
+                    <mxGeometry y="30" width="400" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="htmlnode-methods" value="+ to_html(): str&#xa;+ from_dict(data: dict): HTMLNode&#xa;+ generate_children_html(): tuple&#xa;+ add_child() / remove_child() / clear_children()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="htmlnode" vertex="1">
+                    <mxGeometry y="100" width="400" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="attributes" value="Attributes" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=12;" parent="core-section" vertex="1">
+                    <mxGeometry y="210" width="400" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="attributes-props" value="+ attributes: dict[str, str]&#xa;+ tag_name: str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="attributes" vertex="1">
+                    <mxGeometry y="30" width="400" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="attributes-methods" value="+ attributes_to_html_string(): str&#xa;+ introspect_attributes(): dict&#xa;+ clean_attrs_names(): tuple&#xa;+ combine_all_possible_attributes(): tuple&#xa;+ update_attribute() / clean_attributes()&#xa;+ get_unique_id(): str" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="attributes" vertex="1">
+                    <mxGeometry y="70" width="400" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="primitives-section" value="Primitives" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="100" width="400" height="220" as="geometry"/>
+                </mxCell>
+                <mxCell id="inlinestyles" value="InlineStyles" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;" parent="primitives-section" vertex="1">
+                    <mxGeometry y="30" width="400" height="190" as="geometry"/>
+                </mxCell>
+                <mxCell id="inlinestyles-props" value="+ styles: dict[str, str]&#xa;+ VALID_CSS_PROPERTIES: set[str]" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="inlinestyles" vertex="1">
+                    <mxGeometry y="30" width="400" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="inlinestyles-methods" value="+ validate_styles(): dict&#xa;+ clean_style_value(): str&#xa;+ to_string(): str&#xa;+ update_style() / remove_style()&#xa;+ clear_styles() / get_style()" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="inlinestyles" vertex="1">
+                    <mxGeometry y="70" width="400" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="constants-section" value="Constants &amp; Mappers" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="1040" y="100" width="480" height="400" as="geometry"/>
+                </mxCell>
+                <mxCell id="html-tags" value="HTML_TAGS" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" parent="constants-section" vertex="1">
+                    <mxGeometry y="30" width="480" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="html-tags-content" value="dict[str, tuple[tuple[str, ...], bool]]&#xa;&#xa;Maps tag names to (allowed_attributes, is_self_closing)&#xa;Example: &#39;div&#39;: ((), False), &#39;img&#39;: ((&#39;src&#39;, &#39;alt&#39;, ...), True)" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="html-tags" vertex="1">
+                    <mxGeometry y="30" width="480" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="global-attrs" value="GLOBAL_ATTRIBUTES" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" parent="constants-section" vertex="1">
+                    <mxGeometry y="130" width="480" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="global-attrs-content" value="tuple[str, ...]&#xa;&#xa;Contains: id, class, style, title, lang, dir, tabindex, etc." style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="global-attrs" vertex="1">
+                    <mxGeometry y="30" width="480" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="event-attrs" value="EVENT_ATTRIBUTES" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;" parent="constants-section" vertex="1">
+                    <mxGeometry y="220" width="480" height="90" as="geometry"/>
+                </mxCell>
+                <mxCell id="event-attrs-content" value="tuple[str, ...]&#xa;&#xa;Contains: onclick, onload, onchange, onsubmit, etc." style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="event-attrs" vertex="1">
+                    <mxGeometry y="30" width="480" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="unique-id" value="UNIQUE_IDENTIFIER = &#39;id&#39;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=12;fontStyle=1;" parent="constants-section" vertex="1">
+                    <mxGeometry y="310" width="480" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="types-section" value="Type Definitions" style="swimlane;fontStyle=1;childLayout=stackLayout;horizontal=1;startSize=30;horizontalStack=0;resizeParent=1;resizeParentMax=0;resizeLast=0;collapsible=1;marginBottom=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=14;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="360" width="400" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="attrvalue" value="AttrValue" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12;fontStyle=1;" parent="types-section" vertex="1">
+                    <mxGeometry y="30" width="400" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="attrvalue-desc" value="Type alias for attribute values&#xa;Used for type hints in attribute processing" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;whiteSpace=wrap;html=1;" parent="types-section" vertex="1">
+                    <mxGeometry y="70" width="400" height="70" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

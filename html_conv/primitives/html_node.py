@@ -1,7 +1,8 @@
 from typing import Any
 
-from html_conv.attributes import Attributes
 from html_conv.constants.html_tag_mappers import HTML_TAGS
+from html_conv.primitives.attributes import Attributes
+from html_conv.primitives.inline_styles import InlineStyleAttributes
 
 
 class HTMLNode:
@@ -10,6 +11,7 @@ class HTMLNode:
         tag_name: str,
         attributes: Attributes,
         is_self_closed_tag: bool,
+        inline_styles: InlineStyleAttributes,
         children: "tuple[HTMLNode | str, ...]" = (),
     ):
         """Initialize a new HTML node instance.
@@ -44,6 +46,7 @@ class HTMLNode:
         self._node_id = attributes.get_unique_id()
         self.tag_name = tag_name
         self.attributes = attributes
+        self.inline_styles = inline_styles
         self.children = children
         self.is_self_closed_tag = is_self_closed_tag
 
@@ -101,11 +104,18 @@ class HTMLNode:
             raise ValueError("Dictionary must contain valid 'tag_name' key")
 
         is_self_closed_tag = tag_values[1]
+        raw_attrs = interpretable_data.get("attributes", {})
 
+        inline_styles = cls.create_inline_style_attributes_instance(raw_attrs)
         attributes = Attributes(interpretable_data.get("attributes", {}), tag_name)
 
         # Create the Node instance with the provided tag name and attributes
-        node = cls(interpretable_data["tag_name"], attributes, is_self_closed_tag)
+        node = cls(
+            interpretable_data["tag_name"],
+            attributes,
+            is_self_closed_tag,
+            inline_styles=inline_styles,
+        )
 
         children = interpretable_data.get("children", ())
         node.add_children(cls.generate_children_html(children))
@@ -193,3 +203,30 @@ class HTMLNode:
             else:
                 children_nodes.append(child_data)
         return tuple(children_nodes)
+
+    @staticmethod
+    def create_inline_style_attributes_instance(
+        raw_attrs: dict[str, str | dict[str, str]],
+    ) -> InlineStyleAttributes:
+        if "style" not in raw_attrs:
+            return InlineStyleAttributes({})
+
+        inline_styles = raw_attrs["style"]
+
+        if isinstance(inline_styles, dict):
+            del raw_attrs["style"]
+        else:
+            raise ValueError("Style attribute must be a dictionary")
+
+        return InlineStyleAttributes(inline_styles)
+
+    def remove_children(self) -> None:
+        """Remove all child nodes from this node.
+
+        This method modifies the node's children in place and sets the children
+        tuple to an empty tuple.
+
+        Returns:
+            None: This method modifies the node's children in place and returns nothing.
+        """
+        self.children = ()

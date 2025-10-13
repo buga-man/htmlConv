@@ -1,5 +1,4 @@
 from html_conv.constants import html_tag_mappers
-from html_conv.types import AttrValue
 
 
 class Attributes:
@@ -24,7 +23,7 @@ class Attributes:
         )
         return combined_attributes if combined_attributes else ""
 
-    def clean_attributes(self) -> None:
+    def remove_attrs(self) -> None:
         """Remove all attributes from this node.
 
         Clears the node's attributes dictionary by setting it to an empty dictionary.
@@ -37,7 +36,7 @@ class Attributes:
         """
         self.attributes = {}
 
-    def update_attribute(
+    def update_attr(
         self, attribute_name: str, new_value: str, create_new: bool = True
     ) -> None:
         """Update or create an HTML attribute for this node.
@@ -63,6 +62,23 @@ class Attributes:
         else:
             if attribute_name in self.attributes:
                 self.attributes[attribute_name] = new_value
+
+    def get_attr(self, attribute_name: str) -> str:
+        """Retrieve the value of a specific attribute.
+        Returns:
+            str: The value of the specified attribute, or None if the
+            attribute does not exist.
+            If the attribute does not exist, this method returns empty string.
+        """
+        return self.attributes.get(attribute_name, "")
+
+    def remove_attr(self, attribute_name: str) -> None:
+        """
+        if attribute_name in self.attributes:
+            del self.attributes[attribute_name]
+        """
+        if attribute_name in self.attributes:
+            del self.attributes[attribute_name]
 
     @classmethod
     def introspect_attributes(
@@ -116,7 +132,7 @@ class Attributes:
                 from the result.
         """
         clean_attrs = []
-        all_possible_attrs = cls.combine_all_possible_attributes(tag_name)
+        all_possible_attrs = cls.__combine_all_possible_attributes(tag_name)
         for attr_name in attributes:
             if attr_name in all_possible_attrs:
                 clean_attrs.append(attr_name)
@@ -125,7 +141,7 @@ class Attributes:
         return tuple(clean_attrs)
 
     @classmethod
-    def combine_all_possible_attributes(cls, tag_name: str) -> tuple[str, ...]:
+    def __combine_all_possible_attributes(cls, tag_name: str) -> tuple[str, ...]:
         """Combine all valid attributes for a specific HTML tag.
 
         This method aggregates all possible attributes that can be applied to a given
@@ -152,25 +168,6 @@ class Attributes:
             full_attrs += main_attrs[0]
 
         return full_attrs
-
-    @staticmethod
-    def introspect_attr_value(value: AttrValue) -> str:
-        """Convert and normalize an attribute value to a string.
-
-        This method processes an attribute value by converting it to a string
-        representation and removing leading/trailing whitespace. If the value
-        is None, it returns an empty string instead.
-
-        Args:
-            value (AttrValue): The attribute value to be processed. Can be of any type,
-                including strings, numbers, or other objects that can be
-                converted to strings.
-
-        Returns:
-            str: The processed attribute value as a string with leading and trailing
-                whitespace removed. Returns an empty string if the input value is None.
-        """
-        return str(value).strip()
 
     def get_unique_id(self) -> str:
         return self.attributes.get("id", "")
