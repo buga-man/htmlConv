@@ -2,7 +2,7 @@ from typing import Any
 
 from html_conv.constants.html_tag_mappers import HTML_TAGS
 from html_conv.primitives.attributes import Attributes
-from html_conv.primitives.inline_styles import InlineStyleAttributes
+from html_conv.primitives.inline_style_attributes import InlineStyleAttributes
 
 
 class HTMLNode:

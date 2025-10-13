@@ -7,7 +7,7 @@ def node_to_html(child: HTMLNode | str) -> str:
     return to_html(child)
 
 
-def to_html(root_node: HTMLNode) -> str:
+def to_html(root_node: "HTMLNode") -> str:
     inline_styles = root_node.inline_styles.to_string()
     html_attrs = inline_styles + " " + root_node.attributes.attributes_to_html_string()
     html: str
