@@ -7,8 +7,9 @@ def node_to_html(child: HTMLNode | str) -> str:
     return to_html(child)
 
 
-def to_html(root_node: HTMLNode) -> str:
-    html_attrs = root_node.attributes.attributes_to_html_string()
+def to_html(root_node: "HTMLNode") -> str:
+    inline_styles = root_node.inline_styles.to_string()
+    html_attrs = inline_styles + " " + root_node.attributes.attributes_to_html_string()
     html: str
     if root_node.is_self_closed_tag:
         html = create_self_closing_tag_string(root_node, html_attrs)

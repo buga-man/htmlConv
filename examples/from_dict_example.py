@@ -45,7 +45,12 @@ def main() -> None:
                                 "children": [
                                     {
                                         "tag_name": "p",
-                                        "attributes": {},
+                                        "attributes": {
+                                            "style": {
+                                                "font-weight": "bold",
+                                                "text-decoration": "underline",
+                                            }
+                                        },
                                         "children": [
                                             "html-conv is a Python library for "
                                             "building HTML structures programmatically."
