@@ -16,7 +16,7 @@ def to_html(root_node: "HTMLNode") -> str:
     else:
         html = (
             create_open_tag_string(root_node, html_attrs)
-            + "".join(node_to_html(child) for child in root_node.children)
+            + "".join(node_to_html(child) for child in root_node.get_children())
             + create_close_tag_string(root_node)
         )
     return html

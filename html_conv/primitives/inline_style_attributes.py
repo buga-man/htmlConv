@@ -1,5 +1,8 @@
 from typing import Any
 
+from html_conv.constants.css_properties import CSS_PROPERTIES
+from html_conv.helpers.helpers import normalize_string_values
+
 
 class InlineStyleAttributes:
     """Validator and manager for inline CSS styles.
@@ -29,10 +32,13 @@ class InlineStyleAttributes:
         validated_styles = {}
 
         for property_name, value in styles.items():
-            normalized_property = property_name.strip().lower()
+            if property_name in CSS_PROPERTIES:
+                normalized_property = property_name.strip().lower()
 
-            if cleaned_value := cls.clean_style_value(value):
-                validated_styles[normalized_property] = cleaned_value
+                if cleaned_value := cls.clean_style_value(value):
+                    validated_styles[normalized_property] = cleaned_value
+            else:
+                print(f"Warning: Invalid property '{property_name}'.")
 
         return validated_styles
 
@@ -52,6 +58,7 @@ class InlineStyleAttributes:
         str_value = str(value).strip()
 
         dangerous_patterns = ["javascript:", "expression(", "<script"]
+
         for pattern in dangerous_patterns:
             if pattern.lower() in str_value.lower():
                 print(f"Warning: Potentially dangerous value '{str_value}' rejected.")
@@ -81,14 +88,17 @@ class InlineStyleAttributes:
             value: Value for the property
             create_new: Whether to create new property if it doesn't exist
         """
-        normalized_property = attribute_name.strip().lower()
+        normalized_property = normalize_string_values(attribute_name)
 
         if not create_new and normalized_property not in self.styles:
             return
 
         cleaned_value = self.clean_style_value(value)
         if cleaned_value:
-            self.styles[normalized_property] = cleaned_value
+            if normalized_property in CSS_PROPERTIES:
+                self.styles[normalized_property] = cleaned_value
+            else:
+                print(f"Warning: Invalid property '{attribute_name}'.")
 
     def remove_attr(self, attribute_name: str) -> None:
         """Remove a CSS property from styles.
@@ -112,5 +122,5 @@ class InlineStyleAttributes:
         Returns:
             Value of the property, or empty string if not found
         """
-        normalized_property = attribute_name.strip().lower()
+        normalized_property = normalize_string_values(attribute_name)
         return self.styles.get(normalized_property, "")
