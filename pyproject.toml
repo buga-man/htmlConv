@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "html-conv"
-version = "0.0.1"
+version = "0.0.2"
 description = "A Python library for converting and manipulating HTML structures using a Node-based approach"
 readme = "README.md"
 requires-python = ">=3.13"
