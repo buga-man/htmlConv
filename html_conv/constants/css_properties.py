@@ -14,7 +14,6 @@ CSS_PROPERTIES = (
     "overflow-y",
     "clip",
     "visibility",
-    
     # Box Model
     "width",
     "min-width",
@@ -33,7 +32,6 @@ CSS_PROPERTIES = (
     "padding-bottom",
     "padding-left",
     "box-sizing",
-    
     # Border
     "border",
     "border-width",
@@ -68,7 +66,6 @@ CSS_PROPERTIES = (
     "border-image-repeat",
     "border-collapse",
     "border-spacing",
-    
     # Background
     "background",
     "background-color",
@@ -82,7 +79,6 @@ CSS_PROPERTIES = (
     "background-clip",
     "background-origin",
     "background-blend-mode",
-    
     # Typography
     "color",
     "font",
@@ -116,18 +112,15 @@ CSS_PROPERTIES = (
     "unicode-bidi",
     "writing-mode",
     "vertical-align",
-    
     # Lists
     "list-style",
     "list-style-type",
     "list-style-position",
     "list-style-image",
-    
     # Tables
     "caption-side",
     "empty-cells",
     "table-layout",
-    
     # Flexbox
     "flex",
     "flex-direction",
@@ -144,7 +137,6 @@ CSS_PROPERTIES = (
     "gap",
     "row-gap",
     "column-gap",
-    
     # Grid
     "grid",
     "grid-template",
@@ -164,7 +156,6 @@ CSS_PROPERTIES = (
     "place-items",
     "place-content",
     "place-self",
-    
     # Transform & Animation
     "transform",
     "transform-origin",
@@ -186,7 +177,6 @@ CSS_PROPERTIES = (
     "animation-direction",
     "animation-fill-mode",
     "animation-play-state",
-    
     # Effects
     "opacity",
     "filter",
@@ -194,7 +184,6 @@ CSS_PROPERTIES = (
     "box-shadow",
     "mix-blend-mode",
     "isolation",
-    
     # Multi-column Layout
     "columns",
     "column-count",
@@ -209,7 +198,6 @@ CSS_PROPERTIES = (
     "break-before",
     "break-after",
     "break-inside",
-    
     # User Interface
     "cursor",
     "outline",
@@ -228,13 +216,11 @@ CSS_PROPERTIES = (
     "scroll-snap-align",
     "scroll-snap-stop",
     "touch-action",
-    
     # Content
     "content",
     "quotes",
     "counter-reset",
     "counter-increment",
-    
     # Masking & Clipping
     "clip-path",
     "mask",
@@ -246,29 +232,22 @@ CSS_PROPERTIES = (
     "mask-origin",
     "mask-size",
     "mask-composite",
-    
     # Shapes
     "shape-outside",
     "shape-margin",
     "shape-image-threshold",
-    
     # Object Fit
     "object-fit",
     "object-position",
-    
     # Aspect Ratio
     "aspect-ratio",
-    
     # Appearance
     "appearance",
-    
     # Will Change
     "will-change",
-    
     # Contain
     "contain",
     "content-visibility",
-    
     # Inset
     "inset",
     "inset-block",
@@ -277,7 +256,6 @@ CSS_PROPERTIES = (
     "inset-inline",
     "inset-inline-start",
     "inset-inline-end",
-    
     # Logical Properties
     "block-size",
     "inline-size",
@@ -325,17 +303,14 @@ CSS_PROPERTIES = (
     "border-start-end-radius",
     "border-end-start-radius",
     "border-end-end-radius",
-    
     # Overscroll
     "overscroll-behavior",
     "overscroll-behavior-x",
     "overscroll-behavior-y",
     "overscroll-behavior-inline",
     "overscroll-behavior-block",
-    
     # Accent Color
     "accent-color",
-    
     # Print
     "page-break-before",
     "page-break-after",

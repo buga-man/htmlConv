@@ -23,7 +23,10 @@ def to_html(root_node: "HTMLNode") -> str:
 
 
 def create_open_tag_string(node: HTMLNode, html_attrs: str) -> str:
-    return f"<{node.tag_name} {html_attrs}>"
+    tag_template = f"{node.tag_name}"
+    if len(html_attrs) > 1:
+        tag_template += f"{html_attrs}"
+    return f"<{tag_template}>"
 
 
 def create_close_tag_string(node: HTMLNode) -> str:
@@ -31,4 +34,7 @@ def create_close_tag_string(node: HTMLNode) -> str:
 
 
 def create_self_closing_tag_string(node: HTMLNode, html_attrs: str) -> str:
-    return f"<{node.tag_name} {html_attrs}/>"
+    tag_template = f"{node.tag_name}"
+    if len(html_attrs) > 1:
+        tag_template += f"{html_attrs}"
+    return f"<{tag_template}/>"
