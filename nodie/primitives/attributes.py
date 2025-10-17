@@ -1,4 +1,4 @@
-from html_conv.constants import html_tag_mappers
+from nodie.constants import html_tag_mappers
 
 
 class Attributes:

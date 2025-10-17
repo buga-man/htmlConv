@@ -1,9 +1,9 @@
 from typing import Any
 
-from html_conv.constants.html_tag_mappers import HTML_TAGS
-from html_conv.constants.types import ExternalAttributesType, NodeAttributesType
-from html_conv.primitives.attributes import Attributes
-from html_conv.primitives.inline_style_attributes import InlineStyleAttributes
+from nodie.constants.html_tag_mappers import HTML_TAGS
+from nodie.constants.types import ExternalAttributesType, NodeAttributesType
+from nodie.primitives.attributes import Attributes
+from nodie.primitives.inline_style_attributes import InlineStyleAttributes
 
 
 class Children:

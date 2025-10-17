@@ -1,7 +1,7 @@
 from typing import Any
 
-from html_conv.constants.css_properties import CSS_PROPERTIES
-from html_conv.helpers.helpers import normalize_string_values
+from nodie.constants.css_properties import CSS_PROPERTIES
+from nodie.helpers.helpers import normalize_string_values
 
 
 class InlineStyleAttributes:

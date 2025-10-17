@@ -1,4 +1,4 @@
-from html_conv import HTMLNode
+from nodie import HTMLNode
 
 
 def node_to_html(child: HTMLNode | str) -> str:
