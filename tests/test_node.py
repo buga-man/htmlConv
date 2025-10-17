@@ -1,7 +1,7 @@
 from nodie import HTMLNode
-from nodie.primitives.attributes import Attributes
-from nodie.primitives.inline_style_attributes import InlineStyleAttributes
-from nodie.primitives.node import Children
+from nodie.entities.attributes import Attributes
+from nodie.entities.html_node import Children
+from nodie.entities.inline_style_attributes import InlineStyleAttributes
 
 
 def test_create_html_node_instance_with_all_parameters() -> None:

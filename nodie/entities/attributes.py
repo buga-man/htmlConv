@@ -1,4 +1,7 @@
 from nodie.constants import html_tag_mappers
+from nodie.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class Attributes:
@@ -137,7 +140,7 @@ class Attributes:
             if attr_name in all_possible_attrs:
                 clean_attrs.append(attr_name)
             else:
-                print(f"Unknown attribute '{attr_name}' for tag '{tag_name}'.")
+                logger.warning(f"Unknown attribute '{attr_name}' for tag '{tag_name}'.")
         return tuple(clean_attrs)
 
     @classmethod

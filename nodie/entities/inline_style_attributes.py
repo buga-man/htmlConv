@@ -2,6 +2,9 @@ from typing import Any
 
 from nodie.constants.css_properties import CSS_PROPERTIES
 from nodie.helpers.helpers import normalize_string_values
+from nodie.logging_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class InlineStyleAttributes:
@@ -38,7 +41,7 @@ class InlineStyleAttributes:
                 if cleaned_value := cls.clean_style_value(value):
                     validated_styles[normalized_property] = cleaned_value
             else:
-                print(f"Warning: Invalid property '{property_name}'.")
+                logger.warning(f"Warning: Invalid property '{property_name}'.")
 
         return validated_styles
 
@@ -61,7 +64,9 @@ class InlineStyleAttributes:
 
         for pattern in dangerous_patterns:
             if pattern.lower() in str_value.lower():
-                print(f"Warning: Potentially dangerous value '{str_value}' rejected.")
+                logger.warning(
+                    f"Warning: Potentially dangerous value '{str_value}' rejected."
+                )
                 return ""
 
         return str_value
@@ -98,7 +103,7 @@ class InlineStyleAttributes:
             if normalized_property in CSS_PROPERTIES:
                 self.styles[normalized_property] = cleaned_value
             else:
-                print(f"Warning: Invalid property '{attribute_name}'.")
+                logger.warning(f"Warning: Invalid property '{attribute_name}'.")
 
     def remove_attr(self, attribute_name: str) -> None:
         """Remove a CSS property from styles.
