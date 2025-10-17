@@ -14,4 +14,4 @@ A Python library for converting and manipulating HTML structures using a Node-ba
 ## Installation
 
 ```bash
-pip install html-conv
+pip install nodie
