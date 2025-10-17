@@ -41,11 +41,11 @@ dev = [
 
 
 [tool.hatch.build.targets.wheel]
-packages = ["html_conv"]
+packages = ["nodie"]
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/html_conv",
+    "/nodie",
     "/tests",
     "/README.md",
     "/LICENSE",
@@ -100,7 +100,7 @@ warn_unreachable = true
 strict_equality = true
 
 [tool.coverage.run]
-source = ["html_conv"]
+source = ["nodie"]
 omit = ["*/tests/*"]
 
 [tool.coverage.report]
