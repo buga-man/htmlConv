@@ -7,7 +7,11 @@ from nodie.constants.constants import (
     MAX_RECURSION_DEPTH,
 )
 from nodie.constants.html_tag_mappers import HTML_TAGS
-from nodie.constants.types import ExternalAttributesType, NodeAttributesType
+from nodie.constants.types import (
+    ExternalAttributesType,
+    InterpretableDataType,
+    NodeAttributesType,
+)
 from nodie.entities.attributes import Attributes
 from nodie.entities.inline_style_attributes import InlineStyleAttributes
 from nodie.exceptions import SecurityError
@@ -69,11 +73,10 @@ class HTMLNode:
     @classmethod
     def from_dict(
         cls,
-        interpretable_data: NodeAttributesType,
+        interpretable_data: InterpretableDataType,
         attrs_mapper: ExternalAttributesType | None = None,
         _depth: int = 0,
     ) -> "HTMLNode":
-        # Защита от DoS через глубокую рекурсию
         if _depth > MAX_RECURSION_DEPTH:
             raise SecurityError(
                 f"Maximum recursion depth ({MAX_RECURSION_DEPTH}) exceeded. "
@@ -85,15 +88,13 @@ class HTMLNode:
         if not isinstance(tag_name, str):
             raise TypeError(f"Tag name must be a string, got {type(tag_name).__name__}")
 
-        # Валидация tag_name на безопасность
         validated_tag_name = cls.__validate_tag_name(tag_name)
 
-        # Check if the dictionary contains required keys
         if (
             validated_tag_name is None
             or (tag_values := HTML_TAGS.get(validated_tag_name, None)) is None
         ):
-            raise ValueError(f"Invalid or unsupported tag name: '{tag_name}'")
+            raise SecurityError(f"Invalid or unsupported tag name: '{tag_name}'")
 
         is_self_closed_tag = tag_values[1]
 
@@ -101,7 +102,6 @@ class HTMLNode:
             interpretable_data, attrs_mapper
         )
 
-        # Валидация атрибутов на безопасность
         safe_raw_attrs = cls.__validate_attributes(raw_attrs, validated_tag_name)
 
         inline_styles = cls.__create_inline_style_attributes_instance(safe_raw_attrs)
@@ -121,7 +121,7 @@ class HTMLNode:
             is_self_closed_tag,
             inline_styles=inline_styles,
             attrs_map_identifier=attrs_identifier,
-            children=cls.generate_children(children, _depth + 1),
+            children=cls.generate_children(tuple(children), _depth + 1),
         )
 
         return node
@@ -129,14 +129,29 @@ class HTMLNode:
     def get_children(self) -> list["HTMLNode | str"]:
         return self.children.children
 
+    def get_attributes(self) -> dict[str, str]:
+        return self.attributes.attributes
+
     @classmethod
     def generate_children(
-        cls, children: tuple[dict[str, Any] | str, ...], _depth: int = 0
+        cls, children: tuple[InterpretableDataType | str, ...], _depth: int = 0
     ) -> Children:
+        """Generate Children instance from raw children data.
+
+        Args:
+            children: Tuple of child node data or text content
+            _depth: Current recursion depth (internal use)
+
+        Returns:
+            Children instance containing processed child nodes
+        """
         children_nodes: list[HTMLNode | str] = []
         for child_data in children:
             if isinstance(child_data, dict):
-                children_nodes.append(cls.from_dict(child_data, _depth=_depth))
+                # Type narrowing: child_data is InterpretableDataType here
+                children_nodes.append(
+                    cls.from_dict(child_data, attrs_mapper=None, _depth=_depth)
+                )
             elif isinstance(child_data, str):
                 children_nodes.append(cls.__sanitize_text_content(child_data))
         return Children(children_nodes)
@@ -278,9 +293,18 @@ class HTMLNode:
     @classmethod
     def __generate_raw_attributes_from_dict(
         cls,
-        interpretable_data: dict[str, Any],
+        interpretable_data: InterpretableDataType,  # Используйте тип здесь тоже
         attrs_mapper: dict[str, NodeAttributesType] | None = None,
     ) -> tuple[NodeAttributesType, str]:
+        """Extract raw attributes from interpretable data.
+
+        Args:
+            interpretable_data: Dictionary containing node data
+            attrs_mapper: Optional external attributes mapping
+
+        Returns:
+            Tuple of (raw attributes, attributes identifier)
+        """
         if not attrs_mapper:
             return interpretable_data.get("attributes", {}), "default"
 

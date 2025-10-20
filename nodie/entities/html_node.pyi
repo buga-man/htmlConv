@@ -1,6 +1,7 @@
-from typing import Any
-
-from nodie.constants.types import ExternalAttributesType, NodeAttributesType
+from nodie.constants.types import (
+    ExternalAttributesType,
+    InterpretableDataType,
+)
 from nodie.entities.attributes import Attributes
 from nodie.entities.inline_style_attributes import InlineStyleAttributes
 
@@ -36,11 +37,13 @@ class HTMLNode:
     @classmethod
     def from_dict(
         cls,
-        interpretable_data: NodeAttributesType,
+        interpretable_data: InterpretableDataType,
         attrs_mapper: ExternalAttributesType | None = None,
+        _depth: int = 0,
     ) -> HTMLNode: ...
     def get_children(self) -> list[HTMLNode | str]: ...
+    def get_attributes(self) -> dict[str, str]: ...
     @classmethod
     def generate_children(
-        cls, children: tuple[dict[str, Any] | str, ...]
+        cls, children: tuple[InterpretableDataType | str, ...], _depth: int = 0
     ) -> Children: ...
