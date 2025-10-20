@@ -1,5 +1,5 @@
+import html
 import re
-from typing import Any
 
 from nodie.constants.constants import (
     DANGEROUS_ATTRIBUTES,
@@ -15,6 +15,7 @@ from nodie.constants.types import (
 from nodie.entities.attributes import Attributes
 from nodie.entities.inline_style_attributes import InlineStyleAttributes
 from nodie.exceptions import SecurityError
+from nodie.helpers.helpers import normalize_attribute_string_value
 from nodie.logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -77,37 +78,22 @@ class HTMLNode:
         attrs_mapper: ExternalAttributesType | None = None,
         _depth: int = 0,
     ) -> "HTMLNode":
-        if _depth > MAX_RECURSION_DEPTH:
-            raise SecurityError(
-                f"Maximum recursion depth ({MAX_RECURSION_DEPTH}) exceeded. "
-                "Possible DoS attack or malformed data."
-            )
+        cls.check_recursive_depth(_depth)
 
-        tag_name = interpretable_data.get("tag_name")
-
-        if not isinstance(tag_name, str):
-            raise TypeError(f"Tag name must be a string, got {type(tag_name).__name__}")
-
-        validated_tag_name = cls.__validate_tag_name(tag_name)
-
-        if (
-            validated_tag_name is None
-            or (tag_values := HTML_TAGS.get(validated_tag_name, None)) is None
-        ):
-            raise SecurityError(f"Invalid or unsupported tag name: '{tag_name}'")
-
-        is_self_closed_tag = tag_values[1]
+        tag_name, is_self_closed_tag = cls.__get_tag_name_and_is_self_closed_flag(
+            interpretable_data
+        )
 
         raw_attrs, attrs_identifier = cls.__generate_raw_attributes_from_dict(
             interpretable_data, attrs_mapper
         )
 
-        safe_raw_attrs = cls.__validate_attributes(raw_attrs, validated_tag_name)
+        safe_raw_attrs = cls.__validate_attributes(raw_attrs, tag_name)
 
-        inline_styles = cls.__create_inline_style_attributes_instance(safe_raw_attrs)
-        clean_attrs = cls.__clean_attributes(safe_raw_attrs)
+        inline_styles, attributes = cls.__get_styles_and_attributes(
+            safe_raw_attrs, tag_name
+        )
 
-        attributes = Attributes(clean_attrs, validated_tag_name)
         children = interpretable_data.get("children", ())
 
         if not isinstance(children, tuple | list):
@@ -115,16 +101,14 @@ class HTMLNode:
                 f"Children must be an iterable, got {type(children).__name__}"
             )
 
-        node = cls(
-            validated_tag_name,
+        return cls(
+            tag_name,
             attributes,
             is_self_closed_tag,
             inline_styles=inline_styles,
             attrs_map_identifier=attrs_identifier,
             children=cls.generate_children(tuple(children), _depth + 1),
         )
-
-        return node
 
     def get_children(self) -> list["HTMLNode | str"]:
         return self.children.children
@@ -153,7 +137,7 @@ class HTMLNode:
                     cls.from_dict(child_data, attrs_mapper=None, _depth=_depth)
                 )
             elif isinstance(child_data, str):
-                children_nodes.append(cls.__sanitize_text_content(child_data))
+                children_nodes.append(cls.__escape_text_content(child_data))
         return Children(children_nodes)
 
     @staticmethod
@@ -169,7 +153,7 @@ class HTMLNode:
         Raises:
             SecurityError: If tag name contains dangerous characters
         """
-        tag_name = tag_name.strip().lower()
+        tag_name = normalize_attribute_string_value(tag_name)
 
         if not re.match(r"^[a-z][a-z0-9-]*", tag_name):
             logger.error("Invalid tag name format: '%s'", tag_name)
@@ -184,7 +168,9 @@ class HTMLNode:
         return tag_name
 
     @staticmethod
-    def __validate_attributes(attrs: dict[str, Any], tag_name: str) -> dict[str, Any]:
+    def __validate_attributes(
+        attrs: NodeAttributesType, tag_name: str
+    ) -> NodeAttributesType:
         """Validate and sanitize attributes.
 
         Args:
@@ -194,10 +180,10 @@ class HTMLNode:
         Returns:
             Validated attributes dictionary
         """
-        safe_attrs: dict[str, Any] = {}
+        safe_attrs: NodeAttributesType = {}
 
         for key, value in attrs.items():
-            normalized_key = key.strip().lower()
+            normalized_key = normalize_attribute_string_value(key)
 
             if normalized_key in DANGEROUS_ATTRIBUTES:
                 logger.warning(
@@ -216,7 +202,7 @@ class HTMLNode:
                 continue
 
             if isinstance(value, str):
-                safe_value = HTMLNode.__validate_attribute_value(
+                safe_value = HTMLNode.__validate_dangerous_patterns_attribute_value(
                     normalized_key, value, tag_name
                 )
                 if safe_value is not None:
@@ -228,9 +214,9 @@ class HTMLNode:
 
         return safe_attrs
 
-    @staticmethod
-    def __validate_attribute_value(
-        attr_name: str, value: str, tag_name: str
+    @classmethod
+    def __validate_dangerous_patterns_attribute_value(
+        cls, attr_name: str, value: str, tag_name: str
     ) -> str | None:
         """Validate attribute value for dangerous content.
 
@@ -243,6 +229,7 @@ class HTMLNode:
             Safe value or None if invalid
         """
         lower_value = value.lower()
+
         for protocol in DANGEROUS_PROTOCOLS:
             if lower_value.startswith(protocol):
                 logger.warning(
@@ -252,29 +239,11 @@ class HTMLNode:
                     tag_name,
                 )
                 return None
-
-        if len(value) > 1000:
-            logger.warning(
-                "Attribute '%s' value too long (%d chars), truncated",
-                attr_name,
-                len(value),
-            )
-            return value[:1000]
-
         return value
 
     @staticmethod
-    def __sanitize_text_content(text: str) -> str:
-        """Sanitize text content to prevent XSS attacks.
-
-        Args:
-            text: Raw text content
-
-        Returns:
-            Sanitized text content
-        """
-        sanitized = re.sub(r"[<>&]", "", text)
-        return sanitized
+    def __escape_text_content(text: str) -> str:
+        return html.escape(text)
 
     @staticmethod
     def __create_inline_style_attributes_instance(
@@ -293,7 +262,7 @@ class HTMLNode:
     @classmethod
     def __generate_raw_attributes_from_dict(
         cls,
-        interpretable_data: InterpretableDataType,  # Используйте тип здесь тоже
+        interpretable_data: InterpretableDataType,
         attrs_mapper: dict[str, NodeAttributesType] | None = None,
     ) -> tuple[NodeAttributesType, str]:
         """Extract raw attributes from interpretable data.
@@ -317,12 +286,55 @@ class HTMLNode:
         return mapped_attrs, attrs_identifier
 
     @classmethod
-    def __clean_attributes(
-        cls, raw_attrs: dict[str, str | dict[str, str]]
-    ) -> dict[str, str]:
+    def __clean_attributes(cls, raw_attrs: NodeAttributesType) -> dict[str, str]:
         clean_attrs: dict[str, str] = {
             key: value
             for key, value in raw_attrs.items()
             if key != "style" and isinstance(value, str)
         }
         return clean_attrs
+
+    @classmethod
+    def __get_styles_and_attributes(
+        cls, raw_attrs: NodeAttributesType, validated_tag_name: str
+    ) -> tuple[InlineStyleAttributes, Attributes]:
+        safe_raw_attrs = cls.__validate_attributes(raw_attrs, validated_tag_name)
+        inline_styles = cls.__create_inline_style_attributes_instance(safe_raw_attrs)
+        clean_attrs = cls.__clean_attributes(safe_raw_attrs)
+        return inline_styles, Attributes(clean_attrs, validated_tag_name)
+
+    @classmethod
+    def check_recursive_depth(cls, _depth: int) -> None:
+        """Check recursive depth for potential security issues.
+
+        Args:
+            _depth: Current recursion depth (internal use)
+        """
+        if _depth > MAX_RECURSION_DEPTH:
+            logger.error(
+                "Maximum recursion depth exceeded (%d). "
+                "Consider optimizing the HTML structure.",
+                _depth,
+            )
+            raise SecurityError(
+                f"Maximum recursion depth ({MAX_RECURSION_DEPTH}) exceeded. "
+                "Possible DoS attack or malformed data."
+            )
+
+    @classmethod
+    def __get_tag_name_and_is_self_closed_flag(
+        cls, interpretable_data: InterpretableDataType
+    ) -> tuple[str, bool]:
+        tag_name = interpretable_data.get("tag_name")
+
+        if not isinstance(tag_name, str):
+            raise TypeError(f"Tag name must be a string, got {type(tag_name).__name__}")
+
+        validated_tag_name = cls.__validate_tag_name(tag_name)
+
+        if (
+            validated_tag_name is None
+            or (tag_values := HTML_TAGS.get(validated_tag_name, None)) is None
+        ):
+            raise SecurityError(f"Invalid or unsupported tag name: '{tag_name}'")
+        return validated_tag_name, tag_values[1]

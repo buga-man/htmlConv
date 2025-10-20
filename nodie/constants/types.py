@@ -20,7 +20,7 @@ class InterpretableDataType(TypedDict):
     """
 
     tag_name: str
-    attributes: NotRequired[dict[str, str | dict[str, str]]]
+    attributes: NotRequired[NodeAttributesType]
     children: NotRequired[
         tuple["InterpretableDataType | str", ...] | list["InterpretableDataType | str"]
     ]
